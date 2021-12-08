@@ -1,4 +1,4 @@
-## Sciberia helper libraries
+## Sciberia helper libraries v0.1.1
 
 ### Libraries include reader and process under MIT License
 
@@ -12,13 +12,13 @@ python3 -m pip install --upgrade sciberia
 import numpy as np
 from sciberia import Process, Reader
 
-reader = Reader()
-
-if reader.is_dicom("./001.dcm"):
-    print("Metnioned file is DICOM-file")
+path = "/data/scans"
+reader = Reader(path)
+reader.read_filenames()
+print(f"{len(reader.filenames)} studies in {path} directory")
 
 data = np.eye(4)
-process = Process()
+process = Process(data)
 dilated = process.dilation(data)
 print(dilated)
 ```
