@@ -1,10 +1,10 @@
-## Sciberia helper libraries v0.1.1
+## Sciberia helper libraries v0.1.2
 
 ### Libraries include reader and process under MIT License
 
 ### Install
 ```bash
-python3 -m pip install --upgrade sciberia
+python3 -m pip install -U sciberia
 ```
 
 ### HOWTO
@@ -14,7 +14,6 @@ from sciberia import Process, Reader
 
 path = "/data/scans"
 reader = Reader(path)
-reader.read_filenames()
 print(f"{len(reader.filenames)} studies in {path} directory")
 
 data = np.eye(4)
