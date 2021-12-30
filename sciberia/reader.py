@@ -143,7 +143,7 @@ class Reader():
                         series.sort(key=lambda x: float(
                             x.ImagePositionPatient[2]), reverse=True)
             nrrd_set = []
-            if hasattr(study_struct, "nrrd") and len(study_struct["nrrd"]) > 0:
+            if "nrrd" in study_struct and len(study_struct["nrrd"]) > 0:
                 for item in study_struct["nrrd"]:
                     nrrd_data, _ = load_nrrd(study_struct["path"], item)
                     nrrd_set.append({str(item): nrrd_data})
