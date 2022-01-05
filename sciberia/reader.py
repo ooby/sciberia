@@ -145,8 +145,14 @@ class Reader():
             nrrd_set = []
             if "nrrd" in study_struct and len(study_struct["nrrd"]) > 0:
                 for item in study_struct["nrrd"]:
-                    nrrd_data, _ = load_nrrd(study_struct["path"], item)
-                    nrrd_set.append({str(item): nrrd_data})
+                    nrrd_data, nrrd_header = load_nrrd(
+                        study_struct["path"], item)
+                    nrrd_set.append({
+                        str(item): {
+                            "header": nrrd_header,
+                            "data": nrrd_data
+                        }
+                    })
             yield {
                 "dataset": groupped_studies[0],
                 "nrrd": nrrd_set
