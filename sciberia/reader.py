@@ -155,7 +155,8 @@ class Reader():
                     })
             yield {
                 "dataset": groupped_studies[0],
-                "nrrd": nrrd_set
+                "nrrd": nrrd_set,
+                "path": path
             }
 
     def is_dicom(self, path: str) -> bool:
