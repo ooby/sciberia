@@ -1,4 +1,4 @@
-## Sciberia helper libraries v0.1.5
+## Sciberia helper libraries v0.1.6
 
 ### Libraries include reader and process under MIT License
 

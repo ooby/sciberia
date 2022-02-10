@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="sciberia",
-    version="0.1.5",
+    version="0.1.6",
     description="Sciberia helper libraries",
     long_description=README,
     long_description_content_type="text/markdown",
