@@ -159,7 +159,8 @@ class Reader():
                 "path": path
             }
 
-    def is_dicom(self, path: str) -> bool:
+    @staticmethod
+    def is_dicom(path: str) -> bool:
         """Check file whether dicom-file or not"""
         if not os.path.isfile(path):
             return False
@@ -175,7 +176,8 @@ class Reader():
         candidates = [os.path.join(path, f) for f in sorted(os.listdir(path))]
         return [f for f in candidates if self.is_dicom(f)]
 
-    def is_dicomdir(self, path: str = ".") -> Tuple[bool, str]:
+    @staticmethod
+    def is_dicomdir(path: str = ".") -> Tuple[bool, str]:
         """Find first DICOMDIR in subdirectories"""
         dicomdir = False
         for root, _, files in os.walk(path):

@@ -65,7 +65,8 @@ class Process():
         result = np.where(result >= args[1], args[1], result)
         return result
 
-    def ct_get_pixels_hu(self, slices: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def ct_get_pixels_hu(slices: np.ndarray) -> np.ndarray:
         """Get pixel data from dicom-file Dataset"""
         try:
             image = np.stack([s.pixel_array for s in slices])
@@ -85,15 +86,18 @@ class Process():
             image[slice_number] += np.int16(intercept)
         return np.array(image, dtype=np.int16)
 
-    def erosion(self, binary_image: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def erosion(binary_image: np.ndarray) -> np.ndarray:
         """Morphological erosion"""
         return scipy.ndimage.binary_erosion(binary_image).astype(binary_image.dtype)
 
-    def dilation(self, binary_image: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def dilation(binary_image: np.ndarray) -> np.ndarray:
         """Morphological dilation"""
         return scipy.ndimage.binary_dilation(binary_image).astype(binary_image.dtype)
 
-    def generate_sc_dataset(self, image, source_dataset, SeriesInstanceUID, number):
+    @staticmethod
+    def generate_sc_dataset(image, source_dataset, SeriesInstanceUID, number):
         meta = FileMetaDataset()
         meta.TransferSyntaxUID = ImplicitVRLittleEndian
 
