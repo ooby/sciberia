@@ -27,6 +27,8 @@ setup(
         "pydicom",
         "pynrrd",
         "pytest",
-        "scipy"
+        "scipy",
+        "sqlalchemy",
+        "sqlalchemy[asyncio]"
     ]
 )
