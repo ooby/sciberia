@@ -87,6 +87,10 @@ class Reader():
     def filenames(self) -> List:
         return self.__filenames
 
+    @property
+    def data(self) -> List:
+        return self.__groupped_studies
+
     def read_datasets_generator(self, stop_before_pixels: bool = False) -> List:
         for study_struct in self.__filenames:
             datasets = []
@@ -158,6 +162,7 @@ class Reader():
                 "nrrd": nrrd_set,
                 "path": path
             }
+        self.__groupped_studies = groupped_studies
 
     @staticmethod
     def is_dicom(path: str) -> bool:

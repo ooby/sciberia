@@ -105,8 +105,9 @@ class DB():
         return db_study_collection
 
 
-    async def db_write(self, session, study, filenames):
+    def db_write(self, session, study, filenames):
         # TODO: add path prefixes to Series, SOPInstance models and filenames to SOPInstance model
+        print(study)
         _study = Study(
             study_instance_uid=str(study[0][0].StudyInstanceUID),
             path_prefix=filenames["path"]
@@ -133,9 +134,9 @@ class DB():
                 _series.sop_instances.append(_sop_instance)
             _study.series.append(_series)
         # TODO: check _patient unique condition
-        async with session as asess:
+        with session as asess:
             q = select(Patient)
-            result = await asess.execute(q)
+            result = asess.execute(q)
             curr = result.scalars()
             _patient = None
             for item in curr:
@@ -158,4 +159,4 @@ class DB():
             )
         _patient.studies.append(_study)
         session.add(_patient)
-        await session.commit()
+        session.commit()
