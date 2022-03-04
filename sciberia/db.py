@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.future import select
 
 engine = create_engine('sqlite:///database.db')
 Base = declarative_base()
@@ -107,20 +108,19 @@ class DB():
 
     def db_write(self, session, study, filenames):
         # TODO: add path prefixes to Series, SOPInstance models and filenames to SOPInstance model
-        print(study)
         _study = Study(
-            study_instance_uid=str(study[0][0].StudyInstanceUID),
+            study_instance_uid=str(study[0][0]['data'].StudyInstanceUID),
             path_prefix=filenames["path"]
         )
         for series in study:
             _series = Series(
-                series_instance_uid=str(series[0].SeriesInstanceUID)
+                series_instance_uid=str(series[0]['data'].SeriesInstanceUID)
             )
             for sop_instance in series:
                 _sop_instance = SOPInstance(
-                    sop_instance_uid=str(sop_instance.SOPInstanceUID),
+                    sop_instance_uid=str(sop_instance['data'].SOPInstanceUID),
                 )
-                for data_element in sop_instance:
+                for data_element in sop_instance['data']:
                     if isinstance(data_element.private_creator, list):
                         _elem_name = "Private tag data"
                     else:
@@ -134,29 +134,30 @@ class DB():
                 _series.sop_instances.append(_sop_instance)
             _study.series.append(_series)
         # TODO: check _patient unique condition
-        with session as asess:
-            q = select(Patient)
-            result = asess.execute(q)
-            curr = result.scalars()
-            _patient = None
-            for item in curr:
-                if item.patient_id == str(study[0][0].PatientID) and item.patient_name == str(study[0][0].PatientName) and item.patient_birth_data == str(study[0][0].PatientBirthDate):
-                    _patient = item
+        #with session as asess:
+        sess = session()
+        q = select(Patient)
+        result = sess.execute(q)
+        curr = result.scalars()
+        _patient = None
+        for item in curr:
+            if item.patient_id == str(study[0][0]['data'].PatientID) and item.patient_name == str(study[0][0]['data'].PatientName) and item.patient_birth_data == str(study[0][0]['data'].PatientBirthDate):
+                _patient = item
         if _patient is None:
-            if hasattr(study[0][0], "PatientSex"):
-                patsex = str(study[0][0].PatientSex)
+            if hasattr(study[0][0]['data'], "PatientSex"):
+                patsex = str(study[0][0]['data'].PatientSex)
             else:
                 patsex = "Unknown"
-            if hasattr(study[0][0], "PatientAge"):
-                patage = str(study[0][0].PatientAge)
+            if hasattr(study[0][0]['data'], "PatientAge"):
+                patage = str(study[0][0]['data'].PatientAge)
             else:
                 patage = "Unknown"
             _patient = Patient(
-                patient_name=str(study[0][0].PatientName),
-                patient_birth_data=str(study[0][0].PatientBirthDate),
+                patient_name=str(study[0][0]['data'].PatientName),
+                patient_birth_data=str(study[0][0]['data'].PatientBirthDate),
                 patient_sex=patsex,
                 patient_age=patage
             )
         _patient.studies.append(_study)
-        session.add(_patient)
-        session.commit()
+        sess.add(_patient)
+        sess.commit()

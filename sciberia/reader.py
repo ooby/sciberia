@@ -59,6 +59,7 @@ class Reader():
             ]
             for k in [list(j) for _, j in groupby(__filedatasets_datas, lambda m: m["data"].StudyInstanceUID)]
         ]
+        self.__groupped_studies = __groupped_filedatasets
         __dcm_studies = []
         for studies in __groupped_filedatasets:
             paths = []
@@ -162,7 +163,6 @@ class Reader():
                 "nrrd": nrrd_set,
                 "path": path
             }
-        self.__groupped_studies = groupped_studies
 
     @staticmethod
     def is_dicom(path: str) -> bool:
