@@ -29,20 +29,11 @@ class Study(Base):
     id = Column(Integer, primary_key=True)
     study_instance_uid = Column("StudyInstanceUID", String)
     path_prefix = Column("PathPrefix", String)
-    series = relationship("Series", backref=backref(
-        "studies", cascade="all, delete"))
-    patient_id = Column(String, ForeignKey("patients.id"))
-
-
-class Series(Base):
-    __tablename__ = "series"
-
-    id = Column(Integer, primary_key=True)
-    series_instance_uid = Column("SeriesInstanceUID", String)
-    path_prefix = Column("PathPrefix", String)
     sop_instances = relationship("SOPInstance", backref=backref(
-        "series", cascade="all, delete"))
-    study_id = Column(String, ForeignKey("studies.id"))
+        "studyes", cascade="all, delete"))
+    data_elements = relationship("DataElement", backref=backref(
+        "sop_instances", cascade="all, delete"))
+    patient_id = Column(String, ForeignKey("patients.id"))
 
 
 class SOPInstance(Base):
@@ -50,20 +41,21 @@ class SOPInstance(Base):
 
     id = Column(Integer, primary_key=True)
     sop_instance_uid = Column("SOPInstanceUID", String)
+    series_instance_uid = Column("SeriesInstanceUID", String)
     path_prefix = Column("PathPrefix", String)
-    data_elements = relationship("DataElement", backref=backref(
-        "sop_instances", cascade="all, delete"))
-    series_id = Column(String, ForeignKey("series.id"))
+    study_id = Column(String, ForeignKey("studies.id"))
+
 
 
 class DataElement(Base):
     __tablename__ = "data_elements"
 
     id = Column(Integer, primary_key=True)
+    series_instance_uid = Column("SeriesInstanceUID", String)
     name = Column("Name", String)
     tag = Column("Tag", String)
     value = Column("Value", String)
-    sop_instance_id = Column(String, ForeignKey("sop_instances.id"))
+    study_id = Column(String, ForeignKey("studies.id"))
 
 
 class Send(Base):
@@ -113,26 +105,24 @@ class DB():
             path_prefix=filenames["path"]
         )
         for series in study:
-            _series = Series(
-                series_instance_uid=str(series[0]['data'].SeriesInstanceUID)
-            )
             for sop_instance in series:
                 _sop_instance = SOPInstance(
                     sop_instance_uid=str(sop_instance['data'].SOPInstanceUID),
+                    series_instance_uid=str(sop_instance['data'].SeriesInstanceUID)
                 )
-                for data_element in sop_instance['data']:
-                    if isinstance(data_element.private_creator, list):
-                        _elem_name = "Private tag data"
-                    else:
-                        _elem_name = data_element.name
-                    _data_element = DataElement(
-                        name=str(_elem_name),
-                        tag=str(data_element.tag),
-                        value=str(data_element.repval)
-                    )
-                    _sop_instance.data_elements.append(_data_element)
-                _series.sop_instances.append(_sop_instance)
-            _study.series.append(_series)
+                _study.sop_instances.append(_sop_instance)
+            for data_element in series[0]['data']:
+                if isinstance(data_element.private_creator, list):
+                    _elem_name = "Private tag data"
+                else:
+                    _elem_name = data_element.name
+                _data_element = DataElement(
+                    series_instance_uid=str(series[0]['data'].SeriesInstanceUID),
+                    name=str(_elem_name),
+                    tag=str(data_element.tag),
+                    value=str(data_element.repval)
+                )
+                _study.data_elements.append(_data_element)
         # TODO: check _patient unique condition
         #with session as asess:
         sess = session()
